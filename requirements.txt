@@ -4,3 +4,4 @@ fastapi
 pycryptodome
 protobuf_decoder
 gunicorn
+requests
