@@ -1,4 +1,6 @@
-Flask==2.3.2
-requests==2.31.0
-gunicorn
+Flask
+httpx
+fastapi
 pycryptodome
+protobuf_decoder
+gunicorn
