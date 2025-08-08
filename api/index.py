@@ -1,19 +1,17 @@
-import json
+from flask import Flask, request, jsonify
 import requests
-from urllib.parse import parse_qs
-from mybyte import Encrypt_ID, encrypt_api
+from mybyte import Encrypt_ID, encrypt_api  # تأكد أن الملف mybyte.py موجود
 
-def handler(event, context):
+app = Flask(__name__)
+
+@app.route("/remove_friend", methods=["GET"])
+def remove_friend():
     try:
-        query = parse_qs(event.get("queryStringParameters") or "")
-        token = query.get("token", [None])[0]
-        uid = query.get("uid", [None])[0]
+        token = request.args.get("token")
+        uid = request.args.get("uid")
 
         if not token or not uid:
-            return {
-                "statusCode": 400,
-                "body": json.dumps({"error": "Missing token or uid"}, ensure_ascii=False)
-            }
+            return jsonify({"error": "Missing token or uid"}), 400
 
         uid = int(uid)
         id_encrypted = Encrypt_ID(uid)
@@ -35,22 +33,12 @@ def handler(event, context):
         response = requests.post(url, headers=headers, data=data, verify=False)
 
         if response.status_code == 200:
-            return {
-                "statusCode": 200,
-                "body": json.dumps({"status": "success", "message": "Friend removed or action completed!"}, ensure_ascii=False)
-            }
+            return jsonify({"status": "success", "message": "Friend removed or action completed!"})
         else:
-            return {
-                "statusCode": 500,
-                "body": json.dumps({
-                    "status": "failed",
-                    "code": response.status_code,
-                    "response": response.text
-                }, ensure_ascii=False)
-            }
-
+            return jsonify({
+                "status": "failed",
+                "code": response.status_code,
+                "response": response.text
+            }), 500
     except Exception as e:
-        return {
-            "statusCode": 500,
-            "body": json.dumps({"error": str(e)}, ensure_ascii=False)
-        }
+        return jsonify({"error": str(e)}), 500
