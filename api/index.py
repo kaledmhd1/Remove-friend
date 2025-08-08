@@ -1,17 +1,19 @@
-from flask import Flask, request, jsonify
+import json
 import requests
-from mybyte import Encrypt_ID, encrypt_api  # تأكد أن byte.py موجود بنفس المجلد
+from urllib.parse import parse_qs
+from mybyte import Encrypt_ID, encrypt_api
 
-app = Flask(__name__)
-
-@app.route("/remove_friend", methods=["GET"])
-def remove_friend():
+def handler(event, context):
     try:
-        token = request.args.get("token")
-        uid = request.args.get("uid")
+        query = parse_qs(event.get("queryStringParameters") or "")
+        token = query.get("token", [None])[0]
+        uid = query.get("uid", [None])[0]
 
         if not token or not uid:
-            return jsonify({"error": "Missing token or uid"}), 400
+            return {
+                "statusCode": 400,
+                "body": json.dumps({"error": "Missing token or uid"}, ensure_ascii=False)
+            }
 
         uid = int(uid)
         id_encrypted = Encrypt_ID(uid)
@@ -33,13 +35,22 @@ def remove_friend():
         response = requests.post(url, headers=headers, data=data, verify=False)
 
         if response.status_code == 200:
-            return jsonify({"status": "success", "message": "Friend removed or action completed!"})
+            return {
+                "statusCode": 200,
+                "body": json.dumps({"status": "success", "message": "Friend removed or action completed!"}, ensure_ascii=False)
+            }
         else:
-            return jsonify({
-                "status": "failed",
-                "code": response.status_code,
-                "response": response.text
-            }), 500
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+            return {
+                "statusCode": 500,
+                "body": json.dumps({
+                    "status": "failed",
+                    "code": response.status_code,
+                    "response": response.text
+                }, ensure_ascii=False)
+            }
 
+    except Exception as e:
+        return {
+            "statusCode": 500,
+            "body": json.dumps({"error": str(e)}, ensure_ascii=False)
+        }
