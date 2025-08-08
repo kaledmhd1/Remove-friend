@@ -43,10 +43,3 @@ def remove_friend():
             }), 500
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
-def handler(event, context):
-    from flask import Request
-    from werkzeug.wrappers import Request as WerkzeugRequest
-    # تحويل حدث Vercel إلى طلب Flask
-    request.environ.update(event)
-    return app(event, context)
