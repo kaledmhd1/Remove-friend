@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 import requests
-from byte import Encrypt_ID, encrypt_api  # تأكد أن byte.py موجود بنفس المجلد
+from byte import Encrypt_ID, encrypt_api  # تأكد وجود byte.py بنفس المسار أو أعلى
 
 app = Flask(__name__)
 
@@ -42,3 +42,7 @@ def remove_friend():
             }), 500
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@app.route('/favicon.ico')
+def favicon():
+    return '', 204  # No Content
