@@ -1,7 +1,7 @@
 import json
 from flask import Flask, request, jsonify
 import requests
-from byte import Encrypt_ID, encrypt_api  # تأكد أن byte.py موجود بنفس المجلد
+from mybyte import Encrypt_ID, encrypt_api  # تأكد أن byte.py موجود بنفس المجلد
 
 app = Flask(__name__)
 
